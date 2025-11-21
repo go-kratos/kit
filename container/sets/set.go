@@ -3,7 +3,7 @@ package sets
 import (
 	"encoding/json"
 
-	"github.com/go-kratos/kit/containers/maps"
+	"github.com/go-kratos/kit/container/maps"
 )
 
 // Empty is a zero-size struct to use as the value type in the Set map.
