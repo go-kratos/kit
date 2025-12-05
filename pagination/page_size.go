@@ -6,23 +6,29 @@ type Range struct {
 	Limit  int32
 }
 
-// Pagination holds default pagination settings.
-type Pagination struct {
-	Page int32
-	Size int32
+// Paginator defines the interface for resolving pagination parameters.
+type Paginator interface {
+	// Resolve calculates the offset and limit based on the provided page and size.
+	Resolve(page, size int32) Range
 }
 
-// New creates a new Pagination instance with default page and size.
-func New(defaultPage, defaultSize int32) *Pagination {
-	return &Pagination{
+// NewPaginator creates a new Pagination instance with default page and size.
+func NewPaginator(defaultPage, defaultSize int32) Paginator {
+	return &paginator{
 		Page: defaultPage,
 		Size: defaultSize,
 	}
 }
 
+// paginator holds default paginator settings.
+type paginator struct {
+	Page int32
+	Size int32
+}
+
 // Resolve calculates the offset and limit based on the provided page and size,
 // applying defaults when page/size are <= 0.
-func (p *Pagination) Resolve(page, size int32) Range {
+func (p *paginator) Resolve(page, size int32) Range {
 	if page <= 0 {
 		page = p.Page
 	}
