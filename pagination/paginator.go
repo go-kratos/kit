@@ -6,8 +6,8 @@ type PageRequest interface {
 	GetPageSize() int32
 }
 
-// Range holds calculated offset and limit values.
-type Range struct {
+// PageRange holds calculated offset and limit values.
+type PageRange struct {
 	Offset int32
 	Limit  int32
 }
@@ -15,8 +15,8 @@ type Range struct {
 // Paginator defines the interface for resolving pagination parameters.
 type Paginator interface {
 	// Resolve calculates the offset and limit based on the provided page and size.
-	Resolve(page, size int32) Range
-	Parse(req PageRequest) Range
+	Resolve(page, size int32) PageRange
+	Parse(req PageRequest) PageRange
 }
 
 // NewPaginator creates a new Pagination instance with default page and size.
@@ -35,7 +35,7 @@ type paginator struct {
 
 // Resolve calculates the offset and limit based on the provided page and size,
 // applying defaults when page/size are <= 0.
-func (p *paginator) Resolve(page, size int32) Range {
+func (p *paginator) Resolve(page, size int32) PageRange {
 	if page <= 0 {
 		page = p.Page
 	}
@@ -43,13 +43,13 @@ func (p *paginator) Resolve(page, size int32) Range {
 		size = p.Size
 	}
 	offset := (page - 1) * size
-	return Range{
+	return PageRange{
 		Offset: offset,
 		Limit:  size,
 	}
 }
 
 // Parse extracts pagination parameters from a PageRequest and resolves them.
-func (p *paginator) Parse(req PageRequest) Range {
+func (p *paginator) Parse(req PageRequest) PageRange {
 	return p.Resolve(req.GetPageNum(), req.GetPageSize())
 }
