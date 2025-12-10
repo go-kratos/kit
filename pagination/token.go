@@ -30,6 +30,12 @@ func NewTokenGenerator(opts ...TokenOption) TokenGenerator {
 	return t
 }
 
+// TokenRequest represents a request that contains pagination tokens.
+type TokenRequest interface {
+	// GetPageToken returns the page token of the request.
+	GetPageToken() string
+}
+
 // TokenGenerator generates a page token for a given index.
 type TokenGenerator interface {
 	ForIndex(int) string
@@ -38,6 +44,12 @@ type TokenGenerator interface {
 
 type tokenGenerator struct {
 	salt string
+}
+
+// Parse extracts the index from the page token in the request.
+func (t *tokenGenerator) Parse(req TokenRequest) (int, error) {
+	token := req.GetPageToken()
+	return t.GetIndex(token)
 }
 
 // ForIndex generates a page token for the given index.
