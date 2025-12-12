@@ -97,6 +97,26 @@ func (m *Map[K, V]) ToMap() map[K]V {
 	return clone
 }
 
+// ToKeys returns a slice of all keys in the map.
+func (m *Map[K, V]) ToKeys() []K {
+	keys := make([]K, 0)
+	m.Range(func(key K, _ V) bool {
+		keys = append(keys, key)
+		return true
+	})
+	return keys
+}
+
+// ToValues returns a slice of all values in the map.
+func (m *Map[K, V]) ToValues() []V {
+	values := make([]V, 0)
+	m.Range(func(_ K, value V) bool {
+		values = append(values, value)
+		return true
+	})
+	return values
+}
+
 // Clone creates and returns a shallow copy of the Map.
 func (m *Map[K, V]) Clone() *Map[K, V] {
 	clone := New[K, V]()
