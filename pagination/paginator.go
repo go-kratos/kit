@@ -19,28 +19,31 @@ type Paginator interface {
 	Parse(req PageRequest) PageRange
 }
 
-// NewPaginator creates a new Pagination instance with default page and size.
-func NewPaginator(defaultPage, defaultSize int32) Paginator {
+// NewPaginator creates a new Pagination instance with default size and optional max page size.
+func NewPaginator(defaultPageSize, maxPageSize int32) Paginator {
 	return &paginator{
-		Page: defaultPage,
-		Size: defaultSize,
+		DefaultPageSize: defaultPageSize,
+		MaxPageSize:     maxPageSize,
 	}
 }
 
 // paginator holds default paginator settings.
 type paginator struct {
-	Page int32
-	Size int32
+	DefaultPageSize int32
+	MaxPageSize     int32
 }
 
 // Resolve calculates the offset and limit based on the provided page and size,
 // applying defaults when page/size are <= 0.
 func (p *paginator) Resolve(page, size int32) PageRange {
 	if page <= 0 {
-		page = p.Page
+		page = 1
 	}
 	if size <= 0 {
-		size = p.Size
+		size = p.DefaultPageSize
+	}
+	if p.MaxPageSize > 0 && size > p.MaxPageSize {
+		size = p.MaxPageSize
 	}
 	offset := (page - 1) * size
 	return PageRange{
