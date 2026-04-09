@@ -57,7 +57,7 @@ type task struct {
 // Close gracefully drains all pending tasks before stopping workers.
 type Fanout struct {
 	ch     chan task
-	closed atomic.Int32 // 1 = closed
+	closed atomic.Bool
 	wg     sync.WaitGroup
 	opts   options
 }
@@ -102,7 +102,7 @@ func (f *Fanout) Do(ctx context.Context, fn func(context.Context)) error {
 	if fn == nil {
 		return nil
 	}
-	if f.closed.Load() == 1 {
+	if f.closed.Load() {
 		return ErrFanoutClosed
 	}
 	select {
@@ -116,7 +116,7 @@ func (f *Fanout) Do(ctx context.Context, fn func(context.Context)) error {
 // Close stops the Fanout from accepting new tasks, drains all pending tasks,
 // and waits for all workers to finish. It is safe to call multiple times.
 func (f *Fanout) Close() error {
-	if !f.closed.CompareAndSwap(0, 1) {
+	if !f.closed.CompareAndSwap(false, true) {
 		return ErrFanoutClosed
 	}
 	close(f.ch)
