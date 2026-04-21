@@ -90,7 +90,7 @@ func (r *Retry) Do(ctx context.Context, fn func(context.Context) error) error {
 		if err = fn(ctx); err == nil {
 			break
 		}
-		if err != nil && !r.retryable(err) {
+		if !r.retryable(err) {
 			break
 		}
 		retries++
